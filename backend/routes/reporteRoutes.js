@@ -7,12 +7,24 @@ const upload = require("../middleware/upload");
 const {
     crearReporte,
     obtenerReportes,
+    obtenerReportesUsuario,
+    actualizarEstado,
     obtenerEstadisticas
 } = require("../controllers/reporteController");
 
 router.get("/", obtenerReportes);
 
 router.get("/estadisticas", obtenerEstadisticas);
+
+router.get(
+    "/usuario/:id",
+    obtenerReportesUsuario
+);
+
+router.put(
+    "/:id/estado",
+    actualizarEstado
+);
 
 router.post("/", crearReporte);
 

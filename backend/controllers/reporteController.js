@@ -82,6 +82,67 @@ const obtenerReportes = async (req, res) => {
     }
 
 };
+
+// Obtener reportes por usuario
+const obtenerReportesUsuario = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const resultado = await sql.query(`
+            SELECT *
+            FROM Reportes
+            WHERE id_usuario = ${id}
+            ORDER BY fecha_reporte DESC
+        `);
+
+        res.json(resultado.recordset);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            mensaje: "Error al obtener reportes del usuario"
+        });
+
+    }
+
+};
+
+// Actualizar estado
+const actualizarEstado = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+        const { estado } = req.body;
+
+        await sql.query(`
+            UPDATE Reportes
+            SET estado = '${estado}'
+            WHERE id_reporte = ${id}
+        `);
+
+        res.json({
+            success: true,
+            mensaje: "Estado actualizado"
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            mensaje: "Error actualizando estado"
+        });
+
+    }
+
+};
+
+// Estadísticas
 const obtenerEstadisticas = async (req, res) => {
 
     try {
@@ -113,11 +174,27 @@ const obtenerEstadisticas = async (req, res) => {
                 WHERE estado = 'Pendiente'
             `);
 
+        const enProceso =
+            await sql.query(`
+                SELECT COUNT(*) AS total
+                FROM Reportes
+                WHERE estado = 'En Proceso'
+            `);
+
+        const solucionados =
+            await sql.query(`
+                SELECT COUNT(*) AS total
+                FROM Reportes
+                WHERE estado = 'Solucionado'
+            `);
+
         res.json({
             total: total.recordset[0].total,
             accidentes: accidentes.recordset[0].total,
             danos: danos.recordset[0].total,
-            pendientes: pendientes.recordset[0].total
+            pendientes: pendientes.recordset[0].total,
+            enProceso: enProceso.recordset[0].total,
+            solucionados: solucionados.recordset[0].total
         });
 
     } catch (error) {
@@ -134,5 +211,7 @@ const obtenerEstadisticas = async (req, res) => {
 module.exports = {
     crearReporte,
     obtenerReportes,
+    obtenerReportesUsuario,
+    actualizarEstado,
     obtenerEstadisticas
 };

@@ -1,116 +1,278 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+```
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Dashboard</title>
+<title>Dashboard</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+```
 
 </head>
 
 <body class="bg-light">
 
-    <div class="container mt-5">
+```
+<div class="container mt-5">
 
-        <h1 class="mb-4">
-            🚦 Sistema de Reporte Vial
-        </h1>
+    <h1 class="mb-4 text-center">
+        🚦 Sistema de Reporte Vial
+    </h1>
 
-        <div class="row">
+    <div class="row">
 
-            <div class="col-md-3">
-                <div class="card text-center shadow">
-                    <div class="card-body">
-                        <h5>Total Reportes</h5>
-                        <h1 id="total">0</h1>
-                    </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5>Total Reportes</h5>
+                    <h1 id="total">0</h1>
                 </div>
             </div>
-
-            <div class="col-md-3">
-                <div class="card text-center shadow">
-                    <div class="card-body">
-                        <h5>Accidentes</h5>
-                        <h1 id="accidentes">0</h1>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card text-center shadow">
-                    <div class="card-body">
-                        <h5>Daños Viales</h5>
-                        <h1 id="danios">0</h1>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card text-center shadow">
-                    <div class="card-body">
-                        <h5>Pendientes</h5>
-                        <h1 id="pendientes">0</h1>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
-        <div class="mt-5">
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5>Accidentes</h5>
+                    <h1 id="accidentes">0</h1>
+                </div>
+            </div>
+        </div>
 
-            <a href="nuevo-reporte.html" class="btn btn-primary me-2">
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5>Daños Viales</h5>
+                    <h1 id="danios">0</h1>
+                </div>
+            </div>
+        </div>
 
-                ➕ Nuevo Reporte
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5>Pendientes</h5>
+                    <h1 id="pendientes">0</h1>
+                </div>
+            </div>
+        </div>
 
-            </a>
+    </div>
 
-            <a href="reportes.html" class="btn btn-success">
+    <div class="mt-4 text-center">
 
-                📋 Ver Reportes
+        <a href="nuevo-reporte.html"
+            class="btn btn-primary me-2">
 
-            </a>
+            ➕ Nuevo Reporte
+
+        </a>
+
+        <a href="reportes.html"
+            class="btn btn-success">
+
+            📋 Ver Reportes
+
+        </a>
+
+    </div>
+
+    <div class="card shadow mt-4">
+
+        <div class="card-header bg-primary text-white">
+            <h5>📊 Estadísticas de Estados</h5>
+        </div>
+
+        <div class="card-body text-center">
+
+            <div
+                style="
+                    max-width: 400px;
+                    height: 250px;
+                    margin: auto;
+                ">
+
+                <canvas id="graficaReportes"></canvas>
+
+            </div>
 
         </div>
 
     </div>
 
-    <script>
+    <div class="card shadow mt-4">
 
-        async function cargarEstadisticas() {
+        <div class="card-header bg-dark text-white">
 
-            const respuesta =
-                await fetch(
-                    "http://localhost:3000/api/reportes/estadisticas"
+            <h5>
+                🗺️ Mapa de Reportes
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div
+                id="mapa"
+                style="height:500px;">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    async function cargarEstadisticas() {
+
+        const respuesta =
+            await fetch(
+                "http://localhost:3000/api/reportes/estadisticas"
+            );
+
+        const datos =
+            await respuesta.json();
+
+        document.getElementById("total").innerText =
+            datos.total;
+
+        document.getElementById("accidentes").innerText =
+            datos.accidentes;
+
+        document.getElementById("danios").innerText =
+            datos.danos;
+
+        document.getElementById("pendientes").innerText =
+            datos.pendientes;
+
+    }
+
+    async function cargarGrafica() {
+
+        const respuesta =
+            await fetch(
+                "http://localhost:3000/api/reportes/estadisticas"
+            );
+
+        const datos =
+            await respuesta.json();
+
+        const ctx =
+            document.getElementById(
+                "graficaReportes"
+            );
+
+        new Chart(ctx, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    "Pendientes",
+                    "En Proceso",
+                    "Solucionados"
+                ],
+
+                datasets: [{
+                    data: [
+                        datos.pendientes,
+                        datos.enProceso,
+                        datos.solucionados
+                    ]
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        position: "bottom"
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+    async function cargarMapa() {
+
+        const mapa =
+            L.map("mapa")
+                .setView(
+                    [5.028, -73.995],
+                    13
                 );
 
-            const datos =
-                await respuesta.json();
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                attribution:
+                    "&copy; OpenStreetMap"
+            }
+        ).addTo(mapa);
 
-            document.getElementById("total")
-                .innerText =
-                datos.total;
+        const respuesta =
+            await fetch(
+                "http://localhost:3000/api/reportes"
+            );
 
-            document.getElementById("accidentes")
-                .innerText =
-                datos.accidentes;
+        const reportes =
+            await respuesta.json();
 
-            document.getElementById("danios")
-                .innerText =
-                datos.danos;
-            document.getElementById("pendientes")
-                .innerText =
-                datos.pendientes;
+        reportes.forEach(reporte => {
 
-        }
+            if (
+                reporte.latitud &&
+                reporte.longitud
+            ) {
 
-        cargarEstadisticas();
+                L.marker([
+                    reporte.latitud,
+                    reporte.longitud
+                ])
+                    .addTo(mapa)
+                    .bindPopup(`
+                        <b>${reporte.tipo_reporte}</b><br>
+                        ${reporte.descripcion}<br>
+                        Estado: ${reporte.estado}<br>
+                        Dirección: ${reporte.direccion}
+                    `);
 
-        
-    </script>
+            }
+
+        });
+
+    }
+
+    cargarEstadisticas();
+    cargarGrafica();
+    cargarMapa();
+
+</script>
+```
 
 </body>
 
