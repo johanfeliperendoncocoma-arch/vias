@@ -12,7 +12,8 @@ const crearReporte = async (req, res) => {
             latitud,
             longitud,
             direccion,
-            id_usuario
+            id_usuario,
+            imagen
         } = req.body;
 
         await sql.query(`
