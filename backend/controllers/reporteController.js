@@ -1,244 +1,102 @@
-const { sql } = require("../config/db");
+const { pool } = require("../config/db");
 
 // Crear reporte
 const crearReporte = async (req, res) => {
-
     try {
-
         const {
-            tipo_reporte,
-            descripcion,
-            gravedad,
-            latitud,
-            longitud,
-            direccion,
-            id_usuario,
-            imagen
+            tipo_reporte, descripcion, gravedad,
+            latitud, longitud, direccion, id_usuario, imagen
         } = req.body;
 
-        await sql.query(`
-    INSERT INTO Reportes
-    (
-        tipo_reporte,
-        descripcion,
-        gravedad,
-        latitud,
-        longitud,
-        direccion,
-        estado,
-        id_usuario,
-        imagen
-    )
-    VALUES
-    (
-        '${tipo_reporte}',
-        '${descripcion}',
-        '${gravedad}',
-        ${latitud},
-        ${longitud},
-        '${direccion}',
-        'Pendiente',
-        ${id_usuario},
-        '${imagen}'
-    )
-`);
+        await pool.query(
+            `INSERT INTO Reportes
+            (tipo_reporte, descripcion, gravedad, latitud, longitud, direccion, estado, id_usuario, imagen)
+            VALUES (?, ?, ?, ?, ?, ?, 'Pendiente', ?, ?)`,
+            [tipo_reporte, descripcion, gravedad, latitud, longitud, direccion, id_usuario, imagen]
+        );
 
-        res.json({
-            success: true,
-            mensaje: "Reporte guardado correctamente"
-        });
-
+        res.json({ success: true, mensaje: "Reporte guardado correctamente" });
     } catch (error) {
-
         console.error(error);
-
-        res.status(500).json({
-            success: false,
-            mensaje: "Error al guardar reporte"
-        });
-
+        res.status(500).json({ success: false, mensaje: "Error al guardar reporte" });
     }
-
 };
 
 // Obtener todos los reportes
 const obtenerReportes = async (req, res) => {
-
     try {
-
-        const resultado = await sql.query(`
-            SELECT *
-            FROM Reportes
-            ORDER BY fecha_reporte DESC
-        `);
-
-        res.json(resultado.recordset);
-
+        const [rows] = await pool.query(
+            `SELECT * FROM Reportes ORDER BY fecha_reporte DESC`
+        );
+        res.json(rows);
     } catch (error) {
-
         console.error(error);
-
-        res.status(500).json({
-            mensaje: "Error al obtener reportes"
-        });
-
+        res.status(500).json({ mensaje: "Error al obtener reportes" });
     }
-
 };
 
 // Obtener reportes por usuario
 const obtenerReportesUsuario = async (req, res) => {
-
     try {
-
         const { id } = req.params;
-
-        const resultado = await sql.query(`
-            SELECT *
-            FROM Reportes
-            WHERE id_usuario = ${id}
-            ORDER BY fecha_reporte DESC
-        `);
-
-        res.json(resultado.recordset);
-
+        const [rows] = await pool.query(
+            `SELECT * FROM Reportes WHERE id_usuario = ? ORDER BY fecha_reporte DESC`,
+            [id]
+        );
+        res.json(rows);
     } catch (error) {
-
         console.error(error);
-
-        res.status(500).json({
-            mensaje: "Error al obtener reportes del usuario"
-        });
-
+        res.status(500).json({ mensaje: "Error al obtener reportes del usuario" });
     }
-
 };
 
 // Actualizar estado
 const actualizarEstado = async (req, res) => {
-
     try {
-
         const { id } = req.params;
         const { estado } = req.body;
 
-        await sql.query(`
-            UPDATE Reportes
-            SET estado = '${estado}'
-            WHERE id_reporte = ${id}
-        `);
+        await pool.query(
+            `UPDATE Reportes SET estado = ? WHERE id_reporte = ?`,
+            [estado, id]
+        );
 
-        res.json({
-            success: true,
-            mensaje: "Estado actualizado"
-        });
-
+        res.json({ success: true, mensaje: "Estado actualizado" });
     } catch (error) {
-
         console.error(error);
-
-        res.status(500).json({
-            mensaje: "Error actualizando estado"
-        });
-
+        res.status(500).json({ mensaje: "Error actualizando estado" });
     }
-
 };
+
 // Eliminar reporte
 const eliminarReporte = async (req, res) => {
-
     try {
-
         const { id } = req.params;
-
-        await sql.query(`
-            DELETE FROM Reportes
-            WHERE id_reporte = ${id}
-        `);
-
-        res.json({
-            success: true,
-            mensaje: "Reporte eliminado correctamente"
-        });
-
+        await pool.query(`DELETE FROM Reportes WHERE id_reporte = ?`, [id]);
+        res.json({ success: true, mensaje: "Reporte eliminado correctamente" });
     } catch (error) {
-
         console.error(error);
-
-        res.status(500).json({
-            success: false,
-            mensaje: "Error eliminando reporte"
-        });
-
+        res.status(500).json({ success: false, mensaje: "Error eliminando reporte" });
     }
-
 };
+
 // Estadísticas
 const obtenerEstadisticas = async (req, res) => {
-
     try {
+        const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM Reportes`);
+        const [[{ total: accidentes }]] = await pool.query(`SELECT COUNT(*) AS total FROM Reportes WHERE tipo_reporte = 'Accidente'`);
+        const [[{ total: danos }]] = await pool.query(`SELECT COUNT(*) AS total FROM Reportes WHERE tipo_reporte = 'Daño Vial'`);
+        const [[{ total: pendientes }]] = await pool.query(`SELECT COUNT(*) AS total FROM Reportes WHERE estado = 'Pendiente'`);
+        const [[{ total: enProceso }]] = await pool.query(`SELECT COUNT(*) AS total FROM Reportes WHERE estado = 'En Proceso'`);
+        const [[{ total: solucionados }]] = await pool.query(`SELECT COUNT(*) AS total FROM Reportes WHERE estado = 'Solucionado'`);
 
-        const total =
-            await sql.query(`
-                SELECT COUNT(*) AS total
-                FROM Reportes
-            `);
-
-        const accidentes =
-            await sql.query(`
-                SELECT COUNT(*) AS total
-                FROM Reportes
-                WHERE tipo_reporte = 'Accidente'
-            `);
-
-        const danos =
-            await sql.query(`
-                SELECT COUNT(*) AS total
-                FROM Reportes
-                WHERE tipo_reporte = 'Daño Vial'
-            `);
-
-        const pendientes =
-            await sql.query(`
-                SELECT COUNT(*) AS total
-                FROM Reportes
-                WHERE estado = 'Pendiente'
-            `);
-
-        const enProceso =
-            await sql.query(`
-                SELECT COUNT(*) AS total
-                FROM Reportes
-                WHERE estado = 'En Proceso'
-            `);
-
-        const solucionados =
-            await sql.query(`
-                SELECT COUNT(*) AS total
-                FROM Reportes
-                WHERE estado = 'Solucionado'
-            `);
-
-        res.json({
-            total: total.recordset[0].total,
-            accidentes: accidentes.recordset[0].total,
-            danos: danos.recordset[0].total,
-            pendientes: pendientes.recordset[0].total,
-            enProceso: enProceso.recordset[0].total,
-            solucionados: solucionados.recordset[0].total
-        });
-
+        res.json({ total, accidentes, danos, pendientes, enProceso, solucionados });
     } catch (error) {
-
         console.error(error);
-
-        res.status(500).json({
-            mensaje: "Error obteniendo estadísticas"
-        });
-
+        res.status(500).json({ mensaje: "Error obteniendo estadísticas" });
     }
-
 };
+
 module.exports = {
     crearReporte,
     obtenerReportes,

@@ -1,29 +1,23 @@
+const mysql = require("mysql2/promise");
 
-const sql = require("mssql");
-
-const config = {
+const pool = mysql.createPool({
+    host: process.env.DB_SERVER,
+    port: parseInt(process.env.DB_PORT) || 3306,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    server: process.env.DB_SERVER,
-    port: parseInt(process.env.DB_PORT),
     database: process.env.DB_DATABASE,
-
-    options: {
-        encrypt: false,
-        trustServerCertificate: true
-    }
-};
+    waitForConnections: true,
+    connectionLimit: 10
+});
 
 async function conectarDB() {
     try {
-        await sql.connect(config);
-        console.log("✅ SQL Server conectado");
+        const conn = await pool.getConnection();
+        console.log("✅ MySQL conectado");
+        conn.release();
     } catch (error) {
-        console.error("❌ Error SQL:", error);
+        console.error("❌ Error MySQL:", error);
     }
 }
 
-module.exports = {
-    sql,
-    conectarDB
-};
+module.exports = { pool, conectarDB };
