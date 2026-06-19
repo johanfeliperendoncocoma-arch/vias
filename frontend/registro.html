@@ -1,239 +1,155 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReporteVial — Registro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background-color: var(--negro);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(255,107,0,0.04) 60px, rgba(255,107,0,0.04) 61px),
+        repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,107,0,0.04) 60px, rgba(255,107,0,0.04) 61px);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
 
-    <meta charset="UTF-8">
+    .registro-wrap { width: 100%; max-width: 460px; }
 
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    .registro-card {
+      background: var(--gris-oscuro);
+      border: 1px solid #222;
+      border-top: 3px solid var(--verde-ok);
+      border-radius: var(--radio-lg);
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
 
-    <title>Registro</title>
+    .registro-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: var(--blanco);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 0.25rem;
+    }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+    .registro-sub { font-size: 0.85rem; color: #777; margin: 0 0 1.75rem; }
 
+    .step-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 2rem;
+    }
+    .step-bar span { height: 3px; flex: 1; background: #222; border-radius: 2px; }
+    .step-bar span.active { background: var(--verde-ok); }
+  </style>
 </head>
+<body>
+  <div class="registro-wrap">
 
-<body class="bg-light">
-
-    <div class="container mt-5">
-
-        <div class="row justify-content-center">
-
-            <div class="col-md-6">
-
-                <div class="card shadow">
-
-                    <div class="card-header bg-success text-white">
-
-                        <h3>
-                            Registro de Usuario
-                        </h3>
-
-                    </div>
-
-                    <div class="card-body">
-
-                        <form id="registroForm">
-
-                            <div class="mb-3">
-
-                                <label>
-                                    Nombre
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="nombre"
-                                    class="form-control"
-                                    required>
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>
-                                    Correo
-                                </label>
-
-                                <input
-                                    type="email"
-                                    id="correo"
-                                    class="form-control"
-                                    required>
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>
-                                    Contraseña
-                                </label>
-
-                                <input
-                                    type="password"
-                                    id="password"
-                                    class="form-control"
-                                    required>
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>
-                                    Confirmar Contraseña
-                                </label>
-
-                                <input
-                                    type="password"
-                                    id="confirmar"
-                                    class="form-control"
-                                    required>
-
-                            </div>
-
-                            <button
-                                type="submit"
-                                class="btn btn-success">
-
-                                Registrarse
-
-                            </button>
-
-                            <a
-                                href="index.html"
-                                class="btn btn-secondary">
-
-                                Volver
-
-                            </a>
-
-                        </form>
-
-                        <div
-                            id="mensaje"
-                            class="mt-3">
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
+    <div style="text-align:center; margin-bottom:1.5rem;">
+      <div class="app-logo-circle" style="margin: 0 auto 0.75rem;">🚦</div>
+      <h1 class="app-logo-title">ReporteVial</h1>
     </div>
 
-    <script>
+    <div class="registro-card">
+      <h2 class="registro-title">Crear Cuenta</h2>
+      <p class="registro-sub">Únete a la red ciudadana de reporte vial</p>
 
-        document
-            .getElementById("registroForm")
-            .addEventListener("submit",
-                async (e) => {
+      <div class="step-bar">
+        <span class="active"></span>
+        <span class="active"></span>
+        <span></span>
+      </div>
 
-                    e.preventDefault();
+      <form id="registroForm">
 
-                    const nombre =
-                        document
-                        .getElementById("nombre")
-                        .value;
+        <div class="form-group-vial">
+          <label class="form-label-vial">Nombre completo</label>
+          <input type="text" id="nombre" class="form-control-vial" placeholder="Juan García" required>
+        </div>
 
-                    const correo =
-                        document
-                        .getElementById("correo")
-                        .value;
+        <div class="form-group-vial">
+          <label class="form-label-vial">Correo electrónico</label>
+          <input type="email" id="correo" class="form-control-vial" placeholder="correo@ejemplo.com" required>
+        </div>
 
-                    const password =
-                        document
-                        .getElementById("password")
-                        .value;
+        <div class="form-group-vial">
+          <label class="form-label-vial">Contraseña</label>
+          <input type="password" id="password" class="form-control-vial" placeholder="Mínimo 8 caracteres" required>
+        </div>
 
-                    const confirmar =
-                        document
-                        .getElementById("confirmar")
-                        .value;
+        <div class="form-group-vial">
+          <label class="form-label-vial">Confirmar contraseña</label>
+          <input type="password" id="confirmar" class="form-control-vial" placeholder="Repite tu contraseña" required>
+        </div>
 
-                    if (
-                        password !== confirmar
-                    ) {
+        <div id="mensaje"></div>
 
-                        document
-                            .getElementById("mensaje")
-                            .innerHTML =
-                            `
-                            <div class="alert alert-danger">
-                                Las contraseñas no coinciden
-                            </div>
-                            `;
+        <div style="height:1rem;"></div>
 
-                        return;
+        <div style="display:flex; gap:0.6rem;">
+          <a href="login.html" class="btn-vial btn-vial-secondary" style="flex:1; justify-content:center; padding:0.75rem; text-align:center;">
+            ← Volver
+          </a>
+          <button type="submit" class="btn-vial btn-vial-success" style="flex:2; justify-content:center; padding:0.75rem;">
+            ✓ Registrarse
+          </button>
+        </div>
 
-                    }
+      </form>
+    </div>
 
-                    const respuesta =
-                        await fetch(
-                            "http://localhost:3000/api/registro",
-                            {
-                                method: "POST",
+  </div>
 
-                                headers: {
-                                    "Content-Type":
-                                        "application/json"
-                                },
+  <script>
+    document.getElementById("registroForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-                                body: JSON.stringify({
+      const nombre = document.getElementById("nombre").value;
+      const correo = document.getElementById("correo").value;
+      const password = document.getElementById("password").value;
+      const confirmar = document.getElementById("confirmar").value;
+      const msg = document.getElementById("mensaje");
+      const btn = e.target.querySelector('button[type=submit]');
 
-                                    nombre,
-                                    correo,
-                                    password
+      if (password !== confirmar) {
+        msg.innerHTML = `<div class="alert-vial alert-vial-danger">⚠ Las contraseñas no coinciden</div>`;
+        return;
+      }
 
-                                })
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-vial"></span>';
 
-                            }
-                        );
+      try {
+        const respuesta = await fetch("http://localhost:3000/api/registro", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nombre, correo, password })
+        });
+        const resultado = await respuesta.json();
 
-                    const resultado =
-                        await respuesta.json();
-
-                    if (
-                        resultado.success
-                    ) {
-
-                        document
-                            .getElementById("mensaje")
-                            .innerHTML =
-                            `
-                            <div class="alert alert-success">
-                                Usuario registrado correctamente
-                            </div>
-                            `;
-
-                        setTimeout(() => {
-
-                            window.location =
-                                "index.html";
-
-                        }, 2000);
-
-                    } else {
-
-                        document
-                            .getElementById("mensaje")
-                            .innerHTML =
-                            `
-                            <div class="alert alert-danger">
-                                ${resultado.mensaje}
-                            </div>
-                            `;
-
-                    }
-
-                });
-
-    </script>
-
+        if (resultado.success) {
+          msg.innerHTML = `<div class="alert-vial alert-vial-success">✓ Cuenta creada exitosamente. Redirigiendo...</div>`;
+          setTimeout(() => { window.location.href = "login.html"; }, 2000);
+        } else {
+          msg.innerHTML = `<div class="alert-vial alert-vial-danger">⚠ ${resultado.mensaje}</div>`;
+          btn.disabled = false;
+          btn.innerHTML = '✓ Registrarse';
+        }
+      } catch (error) {
+        msg.innerHTML = `<div class="alert-vial alert-vial-danger">🔌 Error de conexión con el servidor</div>`;
+        btn.disabled = false;
+        btn.innerHTML = '✓ Registrarse';
+      }
+    });
+  </script>
 </body>
-
 </html>

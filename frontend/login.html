@@ -1,168 +1,146 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte Vial - Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReporteVial — Iniciar Sesión</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background-color: var(--negro);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(255,107,0,0.04) 60px, rgba(255,107,0,0.04) 61px),
+        repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,107,0,0.04) 60px, rgba(255,107,0,0.04) 61px);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    .login-wrap {
+      width: 100%;
+      max-width: 400px;
+    }
 
-    <style>
-        body {
-            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .login-card {
+      background: var(--gris-oscuro);
+      border: 1px solid #222;
+      border-top: 3px solid var(--naranja);
+      border-radius: var(--radio-lg);
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
 
-        .card-login {
-            width: 100%;
-            max-width: 450px;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
-        }
+    /* Road stripe decoration */
+    .road-strip {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .road-strip span {
+      height: 4px;
+      background: var(--naranja);
+      border-radius: 2px;
+      flex: 1;
+      max-width: 40px;
+      opacity: 0.5;
+    }
+    .road-strip span:nth-child(2) { opacity: 1; max-width: 60px; }
 
-        .logo {
-            font-size: 60px;
-        }
-    </style>
+    .login-card .btn-vial { width: 100%; justify-content: center; padding: 0.75rem; font-size: 1rem; }
+    .login-card .btn-vial + .btn-vial { margin-top: 0.6rem; }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 2rem;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="login-wrap">
 
-    <div class="card card-login p-4">
-
-        <div class="text-center mb-4">
-            <div class="logo">🚦</div>
-            <h2>Reporte Vial</h2>
-            <p class="text-muted">Iniciar Sesión</p>
-        </div>
-
-        <form id="loginForm">
-
-            <div class="mb-3">
-                <label class="form-label">Correo</label>
-
-                <input type="email"
-                    id="correo"
-                    class="form-control"
-                    required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Contraseña</label>
-
-                <input type="password"
-                    id="password"
-                    class="form-control"
-                    required>
-            </div>
-
-            <div id="mensaje"></div>
-
-            <button class="btn btn-primary w-100 mb-2">
-                Ingresar
-            </button>
-
-            <a href="registro.html"
-                class="btn btn-success w-100">
-                Registrarse
-            </a>
-
-        </form>
-
+    <!-- Logo -->
+    <div class="app-logo-block">
+      <div class="app-logo-circle">🚦</div>
+      <h1 class="app-logo-title">ReporteVial</h1>
+      <p class="app-logo-tagline">Sistema de Reportes Viales</p>
+      <p class="app-description">Plataforma ciudadana para reportar accidentes y daños en la infraestructura vial de tu ciudad.</p>
     </div>
 
-    <script>
+    <div class="login-card">
+      <div class="road-strip">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
 
-        document
-            .getElementById("loginForm")
-            .addEventListener("submit", async (e) => {
+      <form id="loginForm">
 
-                e.preventDefault();
+        <div class="form-group-vial">
+          <label class="form-label-vial">Correo electrónico</label>
+          <input type="email" id="correo" class="form-control-vial" placeholder="tu@correo.com" required>
+        </div>
 
-                const correo =
-                    document.getElementById("correo").value;
+        <div class="form-group-vial">
+          <label class="form-label-vial">Contraseña</label>
+          <input type="password" id="password" class="form-control-vial" placeholder="••••••••" required>
+        </div>
 
-                const password =
-                    document.getElementById("password").value;
+        <div id="mensaje"></div>
 
-                try {
+        <div style="height:1rem;"></div>
 
-                    const respuesta = await fetch(
-                        "http://localhost:3000/api/login",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                correo,
-                                password
-                            })
-                        }
-                    );
+        <button type="submit" class="btn-vial btn-vial-primary">
+          🔑 Ingresar al Sistema
+        </button>
 
-                    const data =
-                        await respuesta.json();
+        <a href="registro.html" class="btn-vial btn-vial-secondary" style="width:100%; justify-content:center; padding:0.75rem; margin-top:0.6rem; text-align:center;">
+          ➕ Crear Cuenta Nueva
+        </a>
 
-                    if (data.success) {
+      </form>
+    </div>
 
-                        localStorage.setItem(
-                            "usuario",
-                            JSON.stringify(data.usuario)
-                        );
+    <p class="footer-note">Sistema de gestión vial ciudadana &nbsp;·&nbsp; v2.0</p>
+  </div>
 
-                        if (
-                            data.usuario.rol ===
-                            "Administrador"
-                        ) {
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-                            window.location.href =
-                                "dashboard.html";
+      const correo = document.getElementById("correo").value;
+      const password = document.getElementById("password").value;
+      const btn = e.target.querySelector('button[type=submit]');
+      const msg = document.getElementById("mensaje");
 
-                        } else {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-vial"></span>';
 
-                            window.location.href =
-                                "cliente.html";
+      try {
+        const respuesta = await fetch("http://localhost:3000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ correo, password })
+        });
+        const data = await respuesta.json();
 
-                        }
-
-                    } else {
-
-                        document
-                            .getElementById("mensaje")
-                            .innerHTML =
-                            `
-                            <div class="alert alert-danger">
-                                Usuario o contraseña incorrectos
-                            </div>
-                            `;
-
-                    }
-
-                } catch (error) {
-
-                    console.error(error);
-
-                    document
-                        .getElementById("mensaje")
-                        .innerHTML =
-                        `
-                        <div class="alert alert-danger">
-                            Error de conexión con el servidor
-                        </div>
-                        `;
-
-                }
-
-            });
-
-    </script>
-
+        if (data.success) {
+          localStorage.setItem("usuario", JSON.stringify(data.usuario));
+          window.location.href = data.usuario.rol === "Administrador" ? "dashboard.html" : "cliente.html";
+        } else {
+          msg.innerHTML = `<div class="alert-vial alert-vial-danger">⚠ Usuario o contraseña incorrectos</div>`;
+          btn.disabled = false;
+          btn.innerHTML = '🔑 Ingresar al Sistema';
+        }
+      } catch (error) {
+        msg.innerHTML = `<div class="alert-vial alert-vial-danger">🔌 Error de conexión con el servidor</div>`;
+        btn.disabled = false;
+        btn.innerHTML = '🔑 Ingresar al Sistema';
+      }
+    });
+  </script>
 </body>
-
 </html>

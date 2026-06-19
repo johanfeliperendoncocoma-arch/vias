@@ -1,150 +1,208 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Cliente</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReporteVial — Mi Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background-color: var(--negro); min-height: 100vh; }
+    .main-content { padding: 1.5rem; }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    .user-card {
+      background: linear-gradient(135deg, var(--gris-medio) 0%, #1a1a1a 100%);
+      border: 1px solid #222;
+      border-left: 4px solid var(--verde-ok);
+      border-radius: var(--radio-lg);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .user-avatar {
+      width: 48px; height: 48px;
+      background: var(--verde-ok);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .user-info { flex: 1; min-width: 150px; }
+    .user-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: var(--blanco);
+    }
+    .user-role { font-size: 0.78rem; color: var(--verde-ok); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #555;
+    }
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 0.75rem; display:block; }
+    .empty-state p { font-size: 0.9rem; }
+  </style>
 </head>
+<body>
 
-<body class="bg-light">
+  <!-- Navbar -->
+  <nav class="navbar-vial">
+    <a href="cliente.html" class="navbar-brand-vial">
+      <div class="brand-icon">🚦</div>
+      <div>
+        <span class="brand-text">ReporteVial</span>
+        <span class="brand-sub">Mi Panel</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="nuevo-reporte.html" class="btn-vial btn-vial-primary btn-vial-sm">➕ Nuevo Reporte</a>
+      <button class="btn-vial btn-vial-danger btn-vial-sm" onclick="cerrarSesion()">↩ Salir</button>
+    </div>
+  </nav>
 
-    <div class="container mt-5">
+  <!-- Hero -->
+  <div class="page-hero">
+    <h1 class="page-hero-title">Panel <span>Ciudadano</span></h1>
+    <p class="page-hero-sub">Gestiona y consulta tus reportes viales</p>
+  </div>
 
-        <div class="card shadow">
+  <div class="main-content">
 
-            <div class="card-header bg-success text-white">
-                <h3>Panel Cliente</h3>
-            </div>
-
-            <div class="card-body">
-
-                <h4 id="nombreUsuario"></h4>
-
-                <hr>
-
-                <a href="nuevo-reporte.html"
-                    class="btn btn-primary mb-3">
-                    Nuevo Reporte
-                </a>
-
-                <button
-                    class="btn btn-danger mb-3"
-                    onclick="cerrarSesion()">
-                    Cerrar Sesión
-                </button>
-
-                <hr>
-
-                <h4>Mis Reportes</h4>
-
-                <div class="table-responsive">
-
-                    <table class="table table-bordered table-striped">
-
-                        <thead class="table-dark">
-
-                            <tr>
-                                <th>ID</th>
-                                <th>Tipo</th>
-                                <th>Descripción</th>
-                                <th>Estado</th>
-                                <th>Fecha</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody id="tablaReportes">
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
+    <!-- User card -->
+    <div class="user-card">
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <div class="user-avatar">👤</div>
+        <div class="user-info">
+          <div class="user-name" id="nombreUsuario">—</div>
+          <div class="user-role">Ciudadano Reportador</div>
         </div>
-
+      </div>
+      <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+        <a href="nuevo-reporte.html" class="btn-vial btn-vial-primary btn-vial-sm">➕ Nuevo Reporte</a>
+        <button class="btn-vial btn-vial-danger btn-vial-sm" onclick="cerrarSesion()">↩ Cerrar Sesión</button>
+      </div>
     </div>
 
-    <script>
+    <!-- Mis reportes -->
+    <div class="card-vial">
+      <div class="card-header-vial">
+        <span class="card-header-icon">📋</span>
+        <h5>Mis Reportes</h5>
+        <div style="margin-left:auto;">
+          <span style="font-size:0.8rem; color:#666;" id="contador-reportes">Cargando...</span>
+        </div>
+      </div>
+      <div class="card-body-vial" style="padding:0;">
+        <div id="tabla-wrap" style="overflow-x:auto;">
+          <table class="table-vial">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="tablaReportes">
+              <tr><td colspan="5" style="padding:2rem; text-align:center;"><span class="spinner-vial"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-        const usuario =
-            JSON.parse(
-                localStorage.getItem("usuario")
-            );
+    <!-- Info block -->
+    <div style="margin-top:1.25rem; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:1rem;">
+      <div class="card-vial" style="padding:1.25rem; display:flex; gap:0.75rem; align-items:flex-start;">
+        <span style="font-size:1.5rem;">📍</span>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--blanco); text-transform:uppercase; font-size:0.95rem;">Cómo Reportar</div>
+          <div style="font-size:0.82rem; color:#888; line-height:1.5; margin-top:0.3rem;">Haz clic en "Nuevo Reporte", describe el incidente, añade tu ubicación GPS y una foto de evidencia.</div>
+        </div>
+      </div>
+      <div class="card-vial" style="padding:1.25rem; display:flex; gap:0.75rem; align-items:flex-start;">
+        <span style="font-size:1.5rem;">🔄</span>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--blanco); text-transform:uppercase; font-size:0.95rem;">Seguimiento</div>
+          <div style="font-size:0.82rem; color:#888; line-height:1.5; margin-top:0.3rem;">El estado de tus reportes se actualiza en tiempo real: Pendiente → En Proceso → Solucionado.</div>
+        </div>
+      </div>
+      <div class="card-vial" style="padding:1.25rem; display:flex; gap:0.75rem; align-items:flex-start;">
+        <span style="font-size:1.5rem;">🤝</span>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--blanco); text-transform:uppercase; font-size:0.95rem;">Impacto</div>
+          <div style="font-size:0.82rem; color:#888; line-height:1.5; margin-top:0.3rem;">Cada reporte contribuye a mejorar la infraestructura vial y la seguridad de tu comunidad.</div>
+        </div>
+      </div>
+    </div>
 
-        if (!usuario) {
+  </div>
 
-            window.location.href =
-                "login.html";
+  <script>
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario) window.location.href = "login.html";
 
+    document.getElementById("nombreUsuario").textContent = usuario?.nombre || "Usuario";
+
+    function cerrarSesion() {
+      localStorage.removeItem("usuario");
+      window.location.href = "login.html";
+    }
+
+    const estadoBadge = {
+      "Pendiente": "badge-pendiente",
+      "En Proceso": "badge-proceso",
+      "Solucionado": "badge-solucionado"
+    };
+
+    async function cargarReportes() {
+      try {
+        const r = await fetch(`http://localhost:3000/api/reportes/usuario/${usuario.id}`);
+        const reportes = await r.json();
+
+        document.getElementById("contador-reportes").textContent = `${reportes.length} reporte(s)`;
+
+        if (!reportes.length) {
+          document.getElementById("tablaReportes").innerHTML = `
+            <tr><td colspan="5">
+              <div class="empty-state">
+                <span class="empty-icon">📭</span>
+                <p>Aún no tienes reportes registrados.<br>¡Sé el primero en reportar un incidente en tu zona!</p>
+                <a href="nuevo-reporte.html" class="btn-vial btn-vial-primary btn-vial-sm" style="display:inline-flex;">➕ Crear primer reporte</a>
+              </div>
+            </td></tr>`;
+          return;
         }
 
-        document.getElementById(
-            "nombreUsuario"
-        ).innerText =
-            "Bienvenido " +
-            usuario.nombre;
+        let filas = "";
+        reportes.forEach(rep => {
+          const cls = estadoBadge[rep.estado] || "";
+          filas += `
+            <tr>
+              <td style="font-weight:700; color:var(--naranja);">#${rep.id_reporte}</td>
+              <td><span style="font-weight:600;">${rep.tipo_reporte}</span></td>
+              <td style="max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${rep.descripcion}</td>
+              <td><span class="badge-estado ${cls}">${rep.estado}</span></td>
+              <td style="color:#666; white-space:nowrap;">${new Date(rep.fecha_reporte).toLocaleDateString('es-CO')}</td>
+            </tr>`;
+        });
+        document.getElementById("tablaReportes").innerHTML = filas;
+      } catch(e) {
+        document.getElementById("tablaReportes").innerHTML = `
+          <tr><td colspan="5" class="text-center" style="padding:2rem; color:#ff6b6b;">Error cargando reportes</td></tr>`;
+      }
+    }
 
-        function cerrarSesion() {
-
-            localStorage.removeItem(
-                "usuario"
-            );
-
-            window.location.href =
-                "login.html";
-
-        }
-
-        async function cargarReportes() {
-
-            try {
-
-                const respuesta =
-                    await fetch(
-                        `http://localhost:3000/api/reportes/usuario/${usuario.id}`
-                    );
-
-                const reportes =
-                    await respuesta.json();
-
-                let filas = "";
-
-                reportes.forEach(reporte => {
-
-                    filas += `
-                    <tr>
-                        <td>${reporte.id_reporte}</td>
-                        <td>${reporte.tipo_reporte}</td>
-                        <td>${reporte.descripcion}</td>
-                        <td>${reporte.estado}</td>
-                        <td>${new Date(reporte.fecha_reporte).toLocaleDateString()}</td>
-                    </tr>
-                    `;
-
-                });
-
-                document.getElementById(
-                    "tablaReportes"
-                ).innerHTML = filas;
-
-            } catch (error) {
-
-                console.error(error);
-
-            }
-
-        }
-
-        cargarReportes();
-
-    </script>
-
+    cargarReportes();
+  </script>
 </body>
-
 </html>

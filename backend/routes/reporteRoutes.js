@@ -9,6 +9,7 @@ const {
     obtenerReportes,
     obtenerReportesUsuario,
     actualizarEstado,
+    eliminarReporte,
     obtenerEstadisticas
 } = require("../controllers/reporteController");
 
@@ -24,6 +25,11 @@ router.get(
 router.put(
     "/:id/estado",
     actualizarEstado
+);
+
+router.delete(
+    "/:id",
+    eliminarReporte
 );
 
 router.post("/", crearReporte);

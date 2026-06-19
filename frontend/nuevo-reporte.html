@@ -1,270 +1,314 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuevo Reporte</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReporteVial — Nuevo Reporte</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background-color: var(--negro); min-height: 100vh; }
+    .main-content { padding: 1.5rem; max-width: 680px; margin: 0 auto; }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    .form-section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--naranja);
+      margin: 1.5rem 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .form-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #222;
+    }
+
+    /* Radio group para tipo/gravedad */
+    .radio-group {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .radio-option {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .radio-option input[type=radio] { display: none; }
+
+    .radio-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      padding: 0.9rem 0.5rem;
+      background: #111;
+      border: 1.5px solid #333;
+      border-radius: var(--radio);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #777;
+      line-height: 1.2;
+    }
+
+    .radio-option input[type=radio]:checked + label {
+      border-color: var(--naranja);
+      background: rgba(255,107,0,0.1);
+      color: var(--naranja);
+    }
+
+    .radio-option label .radio-icon { font-size: 1.5rem; }
+
+    /* Gravedad colors */
+    .radio-leve input:checked + label { border-color: var(--verde-ok); background: rgba(46,204,113,0.1); color: var(--verde-ok); }
+    .radio-moderada input:checked + label { border-color: var(--amarillo-alerta); background: rgba(255,215,0,0.1); color: var(--amarillo-alerta); }
+    .radio-grave input:checked + label { border-color: #ff6b6b; background: rgba(255,107,107,0.1); color: #ff6b6b; }
+
+    .submit-area {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .gps-success { color: var(--verde-ok); font-size: 0.85rem; }
+  </style>
 </head>
+<body>
 
-<body class="bg-light">
-
-    <div class="container mt-5">
-
-        <div class="card shadow">
-
-            <div class="card-header bg-primary text-white">
-                <h3>Nuevo Reporte</h3>
-            </div>
-
-            <div class="card-body">
-
-                <form id="reporteForm">
-
-                    <div class="mb-3">
-                        <label class="form-label">Tipo de Reporte</label>
-
-                        <select id="tipo_reporte" class="form-select">
-
-                            <option value="Accidente">
-                                Accidente
-                            </option>
-
-                            <option value="Daño Vial">
-                                Daño Vial
-                            </option>
-
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Gravedad</label>
-
-                        <select id="gravedad" class="form-select">
-
-                            <option value="Leve">Leve</option>
-                            <option value="Moderada">Moderada</option>
-                            <option value="Grave">Grave</option>
-
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Descripción</label>
-
-                        <textarea id="descripcion"
-                            class="form-control"
-                            rows="4"
-                            required></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Dirección</label>
-
-                        <input
-                            type="text"
-                            id="direccion"
-                            class="form-control"
-                            placeholder="Ingrese la dirección"
-                            required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Fotografía de Evidencia</label>
-
-                        <input
-                            type="file"
-                            id="imagen"
-                            class="form-control"
-                            accept="image/*">
-
-                        <small class="text-muted">
-                            Adjunte una fotografía del accidente o daño vial.
-                        </small>
-                    </div>
-
-                    <input type="hidden" id="latitud">
-                    <input type="hidden" id="longitud">
-
-                    <div class="mb-3">
-
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            onclick="obtenerUbicacion()">
-
-                            📍 Obtener GPS
-
-                        </button>
-
-                    </div>
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary">
-
-                        💾 Guardar Reporte
-
-                    </button>
-
-                </form>
-
-                <div id="mensaje" class="mt-3"></div>
-
-            </div>
-
-        </div>
-
+  <!-- Navbar -->
+  <nav class="navbar-vial">
+    <a href="javascript:history.back()" class="navbar-brand-vial">
+      <div class="brand-icon">🚦</div>
+      <div>
+        <span class="brand-text">ReporteVial</span>
+        <span class="brand-sub">Nuevo Reporte</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="cliente.html" class="btn-vial btn-vial-secondary btn-vial-sm">← Mi Panel</a>
     </div>
+  </nav>
 
-    <script>
+  <!-- Hero -->
+  <div class="page-hero">
+    <h1 class="page-hero-title">Registrar <span>Incidente</span></h1>
+    <p class="page-hero-sub">Describe el problema vial con la mayor precisión posible</p>
+  </div>
 
-        function obtenerUbicacion() {
+  <div class="main-content">
+    <div class="card-vial">
+      <div class="card-header-vial">
+        <span class="card-header-icon">📝</span>
+        <h5>Formulario de Reporte</h5>
+      </div>
+      <div class="card-body-vial">
 
-            navigator.geolocation.getCurrentPosition(
+        <form id="reporteForm">
 
-                (posicion) => {
+          <!-- Tipo -->
+          <div class="form-section-title">01 — Tipo de incidente</div>
+          <div class="form-group-vial">
+            <div class="radio-group">
+              <div class="radio-option">
+                <input type="radio" name="tipo_reporte" id="tipo-accidente" value="Accidente" checked>
+                <label for="tipo-accidente">
+                  <span class="radio-icon">🚗</span>
+                  Accidente
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" name="tipo_reporte" id="tipo-vial" value="Daño Vial">
+                <label for="tipo-vial">
+                  <span class="radio-icon">🕳️</span>
+                  Daño Vial
+                </label>
+              </div>
+            </div>
+          </div>
 
-                    document.getElementById("latitud").value =
-                        posicion.coords.latitude;
+          <!-- Gravedad -->
+          <div class="form-section-title">02 — Gravedad</div>
+          <div class="form-group-vial">
+            <div class="radio-group">
+              <div class="radio-option radio-leve">
+                <input type="radio" name="gravedad" id="grav-leve" value="Leve" checked>
+                <label for="grav-leve">
+                  <span class="radio-icon">🟢</span>
+                  Leve
+                </label>
+              </div>
+              <div class="radio-option radio-moderada">
+                <input type="radio" name="gravedad" id="grav-moderada" value="Moderada">
+                <label for="grav-moderada">
+                  <span class="radio-icon">🟡</span>
+                  Moderada
+                </label>
+              </div>
+              <div class="radio-option radio-grave">
+                <input type="radio" name="gravedad" id="grav-grave" value="Grave">
+                <label for="grav-grave">
+                  <span class="radio-icon">🔴</span>
+                  Grave
+                </label>
+              </div>
+            </div>
+          </div>
 
-                    document.getElementById("longitud").value =
-                        posicion.coords.longitude;
+          <!-- Descripción -->
+          <div class="form-section-title">03 — Descripción</div>
+          <div class="form-group-vial">
+            <label class="form-label-vial">Describe el incidente</label>
+            <textarea id="descripcion" class="form-control-vial" rows="4" placeholder="Ej: Bache profundo en carril derecho, aprox. 50cm de diámetro. Riesgo para motociclistas..." required></textarea>
+          </div>
 
-                    alert("Ubicación obtenida correctamente");
+          <!-- Dirección -->
+          <div class="form-section-title">04 — Ubicación</div>
+          <div class="form-group-vial">
+            <label class="form-label-vial">Dirección del incidente</label>
+            <input type="text" id="direccion" class="form-control-vial" placeholder="Ej: Calle 15 #8-22, frente al parque central" required>
+          </div>
 
-                },
+          <div class="form-group-vial">
+            <div class="gps-btn-wrapper">
+              <button type="button" class="btn-vial btn-vial-secondary" onclick="obtenerUbicacion()">
+                📍 Obtener GPS Automático
+              </button>
+              <span class="gps-status" id="gps-status">Sin ubicación GPS</span>
+            </div>
+            <input type="hidden" id="latitud">
+            <input type="hidden" id="longitud">
+          </div>
 
-                () => {
+          <!-- Imagen -->
+          <div class="form-section-title">05 — Evidencia fotográfica</div>
+          <div class="form-group-vial">
+            <div class="file-input-vial" onclick="document.getElementById('imagen').click()" id="file-drop">
+              <span class="file-icon">📷</span>
+              <div class="file-text" id="file-name-text">Haz clic para adjuntar una fotografía del incidente</div>
+              <div style="font-size:0.75rem; color:#555; margin-top:0.25rem;">JPG, PNG, WEBP — Máx. 10MB</div>
+              <input type="file" id="imagen" accept="image/*" onchange="updateFileName(this)">
+            </div>
+          </div>
 
-                    alert("No fue posible obtener la ubicación");
+          <div id="mensaje"></div>
 
-                }
+          <div class="submit-area">
+            <a href="javascript:history.back()" class="btn-vial btn-vial-secondary" style="flex:1; justify-content:center; padding:0.75rem; text-align:center;">
+              ← Cancelar
+            </a>
+            <button type="submit" class="btn-vial btn-vial-primary" id="btn-enviar" style="flex:2; justify-content:center; padding:0.75rem;">
+              💾 Guardar Reporte
+            </button>
+          </div>
 
-            );
+        </form>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    function updateFileName(input) {
+      const txt = document.getElementById("file-name-text");
+      txt.textContent = input.files[0] ? `✓ ${input.files[0].name}` : "Haz clic para adjuntar una fotografía del incidente";
+      if (input.files[0]) {
+        document.getElementById("file-drop").style.borderColor = "var(--verde-ok)";
+        txt.style.color = "var(--verde-ok)";
+      }
+    }
+
+    function obtenerUbicacion() {
+      const status = document.getElementById("gps-status");
+      status.textContent = "Obteniendo ubicación...";
+      status.className = "gps-status";
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          document.getElementById("latitud").value = pos.coords.latitude;
+          document.getElementById("longitud").value = pos.coords.longitude;
+          status.textContent = `✓ ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+          status.className = "gps-status ok";
+        },
+        () => {
+          status.textContent = "⚠ No se pudo obtener ubicación";
+          status.className = "gps-status";
+          status.style.color = "#ff8a80";
+        }
+      );
+    }
+
+    document.getElementById("reporteForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById("btn-enviar");
+      const msg = document.getElementById("mensaje");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-vial"></span> Guardando...';
+
+      try {
+        const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+        let nombreImagen = "";
+        const archivo = document.getElementById("imagen").files[0];
+
+        if (archivo) {
+          const formData = new FormData();
+          formData.append("imagen", archivo);
+          const subida = await fetch("http://localhost:3000/api/reportes/upload", { method: "POST", body: formData });
+          const res = await subida.json();
+          nombreImagen = res.ruta;
         }
 
-        document
-            .getElementById("reporteForm")
-            .addEventListener("submit", async (e) => {
+        const datos = {
+          tipo_reporte: document.querySelector('input[name="tipo_reporte"]:checked').value,
+          gravedad: document.querySelector('input[name="gravedad"]:checked').value,
+          descripcion: document.getElementById("descripcion").value,
+          direccion: document.getElementById("direccion").value,
+          latitud: document.getElementById("latitud").value,
+          longitud: document.getElementById("longitud").value,
+          id_usuario: usuario.id,
+          imagen: nombreImagen
+        };
 
-                e.preventDefault();
+        const r = await fetch("http://localhost:3000/api/reportes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datos)
+        });
+        const resultado = await r.json();
 
-                try {
+        msg.innerHTML = `<div class="alert-vial alert-vial-success">✓ ${resultado.mensaje || "Reporte registrado exitosamente"}</div>`;
+        document.getElementById("reporteForm").reset();
+        document.getElementById("gps-status").textContent = "Sin ubicación GPS";
+        document.getElementById("gps-status").className = "gps-status";
+        document.getElementById("file-name-text").textContent = "Haz clic para adjuntar una fotografía del incidente";
+        document.getElementById("file-drop").style.borderColor = "";
 
-                    const usuario =
-                        JSON.parse(
-                            localStorage.getItem("usuario")
-                        );
+        setTimeout(() => {
+          window.location.href = "cliente.html";
+        }, 2000);
 
-                    let nombreImagen = "";
+      } catch(e) {
+        msg.innerHTML = `<div class="alert-vial alert-vial-danger">⚠ Error al guardar el reporte. Verifica tu conexión.</div>`;
+      }
 
-                    const archivo =
-                        document.getElementById("imagen")
-                            .files[0];
-
-                    if (archivo) {
-
-                        const formData =
-                            new FormData();
-
-                        formData.append(
-                            "imagen",
-                            archivo
-                        );
-
-                        const subida =
-                            await fetch(
-                                "http://localhost:3000/api/reportes/upload",
-                                {
-                                    method: "POST",
-                                    body: formData
-                                }
-                            );
-
-                        const resultadoSubida =
-                            await subida.json();
-
-                        nombreImagen =
-                            resultadoSubida.ruta;
-
-                    }
-
-                    const datos = {
-
-                        tipo_reporte:
-                            document.getElementById("tipo_reporte").value,
-
-                        descripcion:
-                            document.getElementById("descripcion").value,
-
-                        gravedad:
-                            document.getElementById("gravedad").value,
-
-                        direccion:
-                            document.getElementById("direccion").value,
-
-                        latitud:
-                            document.getElementById("latitud").value,
-
-                        longitud:
-                            document.getElementById("longitud").value,
-
-                        id_usuario:
-                            usuario.id,
-
-                        imagen:
-                            nombreImagen
-
-                    };
-
-                    const respuesta =
-                        await fetch(
-                            "http://localhost:3000/api/reportes",
-                            {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(datos)
-                            }
-                        );
-
-                    const resultado =
-                        await respuesta.json();
-
-                    document.getElementById("mensaje")
-                        .innerHTML =
-                        `
-                        <div class="alert alert-success">
-                            ${resultado.mensaje}
-                        </div>
-                        `;
-
-                    document.getElementById("reporteForm").reset();
-
-                }
-                catch (error) {
-
-                    console.error(error);
-
-                    document.getElementById("mensaje")
-                        .innerHTML =
-                        `
-                        <div class="alert alert-danger">
-                            Error al guardar el reporte
-                        </div>
-                        `;
-
-                }
-
-            });
-
-    </script>
-
+      btn.disabled = false;
+      btn.innerHTML = '💾 Guardar Reporte';
+    });
+  </script>
 </body>
-
 </html>

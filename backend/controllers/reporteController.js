@@ -17,29 +17,31 @@ const crearReporte = async (req, res) => {
         } = req.body;
 
         await sql.query(`
-            INSERT INTO Reportes
-            (
-                tipo_reporte,
-                descripcion,
-                gravedad,
-                latitud,
-                longitud,
-                direccion,
-                estado,
-                id_usuario
-            )
-            VALUES
-            (
-                '${tipo_reporte}',
-                '${descripcion}',
-                '${gravedad}',
-                ${latitud},
-                ${longitud},
-                '${direccion}',
-                'Pendiente',
-                ${id_usuario}
-            )
-        `);
+    INSERT INTO Reportes
+    (
+        tipo_reporte,
+        descripcion,
+        gravedad,
+        latitud,
+        longitud,
+        direccion,
+        estado,
+        id_usuario,
+        imagen
+    )
+    VALUES
+    (
+        '${tipo_reporte}',
+        '${descripcion}',
+        '${gravedad}',
+        ${latitud},
+        ${longitud},
+        '${direccion}',
+        'Pendiente',
+        ${id_usuario},
+        '${imagen}'
+    )
+`);
 
         res.json({
             success: true,
@@ -142,7 +144,35 @@ const actualizarEstado = async (req, res) => {
     }
 
 };
+// Eliminar reporte
+const eliminarReporte = async (req, res) => {
 
+    try {
+
+        const { id } = req.params;
+
+        await sql.query(`
+            DELETE FROM Reportes
+            WHERE id_reporte = ${id}
+        `);
+
+        res.json({
+            success: true,
+            mensaje: "Reporte eliminado correctamente"
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            mensaje: "Error eliminando reporte"
+        });
+
+    }
+
+};
 // Estadísticas
 const obtenerEstadisticas = async (req, res) => {
 
@@ -214,5 +244,6 @@ module.exports = {
     obtenerReportes,
     obtenerReportesUsuario,
     actualizarEstado,
+    eliminarReporte,
     obtenerEstadisticas
 };

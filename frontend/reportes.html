@@ -2,160 +2,328 @@
 <html lang="es">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReporteVial — Gestión de Reportes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background-color: var(--negro);
+      min-height: 100vh;
+    }
 
-<title>Reportes Registrados</title>
+    .main-content {
+      padding: 1.5rem;
+    }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    .filter-bar {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .filter-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1.5px solid #333;
+      background: transparent;
+      color: #777;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+      border-color: var(--naranja);
+      color: var(--naranja);
+      background: rgba(255, 107, 0, 0.1);
+    }
+
+    .filter-btn:hover:not(.active) {
+      border-color: #555;
+      color: #aaa;
+    }
+
+    .filter-all.active {
+      border-color: var(--blanco);
+      color: var(--blanco);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .gravedad-badge {
+      font-size: 0.72rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .grav-Leve {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--verde-ok);
+    }
+
+    .grav-Moderada {
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--amarillo-alerta);
+    }
+
+    .grav-Grave {
+      background: rgba(231, 76, 60, 0.15);
+      color: #ff8a80;
+    }
+
+    .tipo-badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .tipo-Accidente {
+      color: #ff8a80;
+    }
+
+    .tipo-Daño-Vial {
+      color: var(--amarillo-alerta);
+    }
+
+    .results-info {
+      font-size: 0.82rem;
+      color: #555;
+      margin-left: auto;
+      font-style: italic;
+    }
+  </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container mt-5">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-    <h2>📋 Reportes Registrados</h2>
-
-    <a href="dashboard.html" class="btn btn-primary">
-        Volver al Dashboard
+  <!-- Navbar -->
+  <nav class="navbar-vial">
+    <a href="dashboard.html" class="navbar-brand-vial">
+      <div class="brand-icon">🚦</div>
+      <div>
+        <span class="brand-text">ReporteVial</span>
+        <span class="brand-sub">Gestión de Reportes</span>
+      </div>
     </a>
+    <div class="nav-links">
+      <a href="nuevo-reporte.html" class="btn-vial btn-vial-primary btn-vial-sm">➕ Nuevo</a>
+      <a href="dashboard.html" class="btn-vial btn-vial-secondary btn-vial-sm">← Dashboard</a>
+      <button class="btn-vial btn-vial-danger btn-vial-sm" onclick="cerrarSesion()">↩ Salir</button>
+    </div>
+  </nav>
 
-</div>
+  <!-- Hero -->
+  <div class="page-hero">
+    <h1 class="page-hero-title">Gestión de <span>Reportes</span></h1>
+    <p class="page-hero-sub">Administra y actualiza el estado de todos los incidentes registrados</p>
+  </div>
 
-<table class="table table-bordered table-hover bg-white">
+  <div class="main-content">
 
-<thead class="table-dark">
+    <!-- Filtros -->
+    <div class="filter-bar">
+      <span
+        style="font-size:0.78rem; color:#555; font-weight:600; text-transform:uppercase; letter-spacing:1px;">Filtrar:</span>
+      <button class="filter-btn filter-all active" onclick="filtrar('todos', this)">Todos</button>
+      <button class="filter-btn" onclick="filtrar('Pendiente', this)">⏳ Pendientes</button>
+      <button class="filter-btn" onclick="filtrar('En Proceso', this)">🔄 En Proceso</button>
+      <button class="filter-btn" onclick="filtrar('Solucionado', this)">✅ Solucionados</button>
+      <span class="results-info" id="results-info"></span>
+    </div>
 
-<tr>
-    <th>ID</th>
-    <th>Tipo</th>
-    <th>Gravedad</th>
-    <th>Dirección</th>
-    <th>Estado</th>
-    <th>Fecha</th>
-</tr>
+    <!-- Tabla -->
+    <div class="card-vial">
+      <div class="card-header-vial">
+        <span class="card-header-icon">📋</span>
+        <h5>Reportes Registrados</h5>
+        <span style="margin-left:auto; font-size:0.8rem; color:#666;" id="count-badge">—</span>
+      </div>
+      <div class="card-body-vial" style="padding:0;">
+        <div class="table-container">
+          <table class="table-vial" id="tabla-reportes">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tipo</th>
+                <th>Gravedad</th>
+                <th>Dirección</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaReportes">
+              <tr>
+                <td colspan="7" style="padding:3rem; text-align:center;"><span class="spinner-vial"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-</thead>
+  </div>
 
-<tbody id="tablaReportes">
-
-</tbody>
-
-</table>
-
-</div>
-
-<script>
-
-async function cargarReportes() {
-
-    try {
-
-        const respuesta =
-            await fetch(
-                "http://localhost:3000/api/reportes"
-            );
-
-        const reportes =
-            await respuesta.json();
-
-        let filas = "";
-
-        reportes.forEach(reporte => {
-
-            filas += `
-            <tr>
-                <td>${reporte.id_reporte}</td>
-                <td>${reporte.tipo_reporte}</td>
-                <td>${reporte.gravedad}</td>
-                <td>${reporte.direccion}</td>
-
-                <td>
-                    <select
-                        class="form-select"
-                        onchange="cambiarEstado(${reporte.id_reporte}, this.value)"
-                    >
-                        <option value="Pendiente"
-                            ${reporte.estado === "Pendiente" ? "selected" : ""}>
-                            Pendiente
-                        </option>
-
-                        <option value="En Proceso"
-                            ${reporte.estado === "En Proceso" ? "selected" : ""}>
-                            En Proceso
-                        </option>
-
-                        <option value="Solucionado"
-                            ${reporte.estado === "Solucionado" ? "selected" : ""}>
-                            Solucionado
-                        </option>
-                    </select>
-                </td>
-
-                <td>
-                    ${new Date(reporte.fecha_reporte).toLocaleString()}
-                </td>
-            </tr>
-            `;
-
-        });
-
-        document.getElementById(
-            "tablaReportes"
-        ).innerHTML = filas;
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert("Error cargando reportes");
-
+  <script>
+    function cerrarSesion() {
+      localStorage.removeItem("usuario");
+      window.location.href = "login.html";
     }
 
-}
+    let todosLosReportes = [];
 
-async function cambiarEstado(id, estado) {
+    async function cargarReportes() {
+      try {
+        const r = await fetch("http://localhost:3000/api/reportes");
+        todosLosReportes = await r.json();
+        renderTabla(todosLosReportes);
+        document.getElementById("count-badge").textContent = `${todosLosReportes.length} total`;
+      } catch (e) {
+        document.getElementById("tablaReportes").innerHTML =
+          `<tr><td colspan="7" style="padding:2rem; text-align:center; color:#ff6b6b;">Error cargando reportes</td></tr>`;
+      }
+    }
 
-    try {
+    function filtrar(estado, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-        const respuesta =
-            await fetch(
-                `http://localhost:3000/api/reportes/${id}/estado`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        estado
-                    })
-                }
-            );
+      const filtrados = estado === 'todos'
+        ? todosLosReportes
+        : todosLosReportes.filter(r => r.estado === estado);
 
-        const resultado =
-            await respuesta.json();
+      renderTabla(filtrados);
+      document.getElementById("results-info").textContent =
+        estado === 'todos' ? '' : `${filtrados.length} resultado(s)`;
+    }
+
+    function renderTabla(reportes) {
+      if (!reportes.length) {
+        document.getElementById("tablaReportes").innerHTML =
+          `<tr><td colspan="7" style="padding:3rem; text-align:center; color:#555;">Sin reportes en esta categoría</td></tr>`;
+        return;
+      }
+
+      let filas = "";
+      reportes.forEach(rep => {
+        const tipoClass = `tipo-${rep.tipo_reporte.replace(' ', '-')}`;
+        const gravClass = `grav-${rep.gravedad}`;
+
+        filas += `
+          <tr data-estado="${rep.estado}">
+            <td style="font-weight:700; color:var(--naranja);">#${rep.id_reporte}</td>
+            <td><span class="tipo-badge ${tipoClass}">${rep.tipo_reporte}</span></td>
+            <td><span class="gravedad-badge ${gravClass}">${rep.gravedad}</span></td>
+            <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#999;" title="${rep.direccion}">${rep.direccion}</td>
+            <td>
+              <select class="select-estado" onchange="cambiarEstado(${rep.id_reporte}, this.value, this)">
+                <option value="Pendiente" ${rep.estado === "Pendiente" ? "selected" : ""}>⏳ Pendiente</option>
+                <option value="En Proceso" ${rep.estado === "En Proceso" ? "selected" : ""}>🔄 En Proceso</option>
+                <option value="Solucionado" ${rep.estado === "Solucionado" ? "selected" : ""}>✅ Solucionado</option>
+              </select>
+            </td>
+            <td style="color:#666; white-space:nowrap;">
+              ${new Date(rep.fecha_reporte).toLocaleString('es-CO', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })}
+            </td>
+            <td>
+  ${rep.imagen
+            ? `
+      <a
+        href="http://localhost:3000/uploads/${rep.imagen}"
+        target="_blank"
+        class="btn btn-info btn-sm">
+        📷 Ver
+      </a>
+      `
+            : `
+      <span style="color:gray;">
+        Sin foto
+      </span>
+      `
+          }
+</td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="eliminarReporte(${rep.id_reporte})">
+                🗑 Eliminar
+              </button>
+            </td>
+          </tr>`;
+      });
+
+      document.getElementById("tablaReportes").innerHTML = filas;
+    }
+
+    async function cambiarEstado(id, estado, selectEl) {
+      selectEl.disabled = true;
+      try {
+        const r = await fetch(`http://localhost:3000/api/reportes/${id}/estado`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estado })
+        });
+        const res = await r.json();
+
+        if (res.success) {
+          const idx = todosLosReportes.findIndex(r => r.id_reporte === id);
+          if (idx !== -1) todosLosReportes[idx].estado = estado;
+          selectEl.closest('tr').dataset.estado = estado;
+          selectEl.style.borderColor = 'var(--verde-ok)';
+          setTimeout(() => { selectEl.style.borderColor = ''; }, 1500);
+        } else {
+          alert("Error al actualizar el estado");
+        }
+      } catch (e) {
+        alert("Error de conexión");
+      }
+      selectEl.disabled = false;
+    }
+
+    async function eliminarReporte(id) {
+      const confirmar = confirm("¿Seguro que deseas eliminar este reporte?");
+      if (!confirmar) return;
+
+      try {
+        const respuesta = await fetch(`http://localhost:3000/api/reportes/${id}`, {
+          method: "DELETE"
+        });
+        const resultado = await respuesta.json();
 
         if (resultado.success) {
-
-            alert("Estado actualizado");
-
+          alert("Reporte eliminado correctamente");
+          todosLosReportes = todosLosReportes.filter(r => r.id_reporte !== id);
+          renderTabla(todosLosReportes);
+          document.getElementById("count-badge").textContent = `${todosLosReportes.length} total`;
+        } else {
+          alert("No se pudo eliminar el reporte");
         }
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert("Error actualizando estado");
-
+      } catch (error) {
+        alert("Error de conexión al intentar eliminar");
+      }
     }
 
-}
-
-cargarReportes();
-
-</script>
+    cargarReportes();
+  </script>
 
 </body>
+
 </html>
