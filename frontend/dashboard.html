@@ -209,7 +209,7 @@
     // Estadísticas
     async function cargarEstadisticas() {
       try {
-        const r = await fetch("http://localhost:3000/api/reportes/estadisticas");
+        const r = await fetch("https://vias-production.up.railway.app/api/reportes/estadisticas");
         const d = await r.json();
         document.getElementById("total").innerText = d.total ?? 0;
         document.getElementById("accidentes").innerText = d.accidentes ?? 0;
@@ -256,7 +256,7 @@
       });
 
       try {
-        const r = await fetch("http://localhost:3000/api/reportes");
+        const r = await fetch("https://vias-production.up.railway.app/api/reportes");
         const reportes = await r.json();
         reportes.forEach(rep => {
           if (rep.latitud && rep.longitud) {

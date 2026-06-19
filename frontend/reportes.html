@@ -188,7 +188,7 @@
 
     async function cargarReportes() {
       try {
-        const r = await fetch("http://localhost:3000/api/reportes");
+        const r = await fetch("https://vias-production.up.railway.app/api/reportes");
         todosLosReportes = await r.json();
         renderTabla(todosLosReportes);
         document.getElementById("count-badge").textContent = `${todosLosReportes.length} total`;
@@ -249,7 +249,7 @@
   ${rep.imagen
             ? `
       <a
-        href="http://localhost:3000/uploads/${rep.imagen}"
+        href="https://vias-production.up.railway.app/uploads/${rep.imagen}"
         target="_blank"
         class="btn btn-info btn-sm">
         📷 Ver
@@ -276,7 +276,7 @@
     async function cambiarEstado(id, estado, selectEl) {
       selectEl.disabled = true;
       try {
-        const r = await fetch(`http://localhost:3000/api/reportes/${id}/estado`, {
+        const r = await fetch(`https://vias-production.up.railway.app/api/reportes/${id}/estado`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ estado })
@@ -303,7 +303,7 @@
       if (!confirmar) return;
 
       try {
-        const respuesta = await fetch(`http://localhost:3000/api/reportes/${id}`, {
+        const respuesta = await fetch(`https://vias-production.up.railway.app/api/reportes/${id}`, {
           method: "DELETE"
         });
         const resultado = await respuesta.json();

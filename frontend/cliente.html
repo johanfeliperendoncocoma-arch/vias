@@ -166,7 +166,7 @@
 
     async function cargarReportes() {
       try {
-        const r = await fetch(`http://localhost:3000/api/reportes/usuario/${usuario.id}`);
+        const r = await fetch(`https://vias-production.up.railway.app/api/reportes/usuario/${usuario.id}`);
         const reportes = await r.json();
 
         document.getElementById("contador-reportes").textContent = `${reportes.length} reporte(s)`;

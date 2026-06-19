@@ -268,7 +268,7 @@
         if (archivo) {
           const formData = new FormData();
           formData.append("imagen", archivo);
-          const subida = await fetch("http://localhost:3000/api/reportes/upload", { method: "POST", body: formData });
+          const subida = await fetch("https://vias-production.up.railway.app/api/reportes/upload", { method: "POST", body: formData });
           const res = await subida.json();
           nombreImagen = res.ruta;
         }
@@ -284,7 +284,7 @@
           imagen: nombreImagen
         };
 
-        const r = await fetch("http://localhost:3000/api/reportes", {
+        const r = await fetch("https://vias-production.up.railway.app/api/reportes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(datos)
